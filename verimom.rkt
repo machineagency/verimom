@@ -20,7 +20,10 @@
 (define (interpretS S env)
   (and env
    (match S
-     [`(path-closed ,name ...) (env-set env name 42)]))) ;TODO: actually set according to pts
+     [`(machine ,name (accepts ,axes ...) (envelope ,dims ...))
+        (env-set env name 9000)]
+     [`(path-closed ,name ...)
+        (env-set env name 42)]))) ;TODO: actually set according to pts
 
 ; Interprets an expression, including point expressions. Returns the result
 ; of the evaluation.
