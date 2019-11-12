@@ -9,19 +9,23 @@
 (define-lift env-ref [(dict? symbol?) dict-ref])
 (define-lift env-set [(dict? symbol? integer?) dict-set])
 
-; Returns the result of evaluating the given Verimom program on the provided inputs,
+; Returns the result of evaluating the given Verimom program
 ; or #f if the program aborts.
-(define (interpret prog inputs)
+(define (interpret prog)
   (match-define `(verimom ,_ (,args ...) : (,rets ...) ,_ ... ,S) prog)
-  (define env (interpretS S (map cons args inputs)))
+  (define env (interpretS S (list)))
   (and env (for/list ([ret rets]) (env-ref env ret))))
 
 ; Interprets a statement. Returns an updated environment
 (define (interpretS S env)
   (and env
    (match S
-     [`(machine ,name (accepts ,axes ...) (envelope ,dims ...))
-        (env-set env name 9000)]
+     [`(machine ,name ,acceptsS ,envelopeS))
+        (???(interpretS acceptsS) (interpretS envelopeS))]
+     [`(accepts ,axes ...)
+        ???]
+     [`(envelope ,dims ...)
+        ???]
      [`(path-closed ,name ...)
         (env-set env name 42)]))) ;TODO: actually set according to pts
 
@@ -48,11 +52,11 @@
 ; the given Verimom program.
 (define-syntax (verimom stx)
   (syntax-case stx (:)
-    [(_ id (arg ...) : (ret ...) contract ... stmt)
+    [(_ id contract ... stmt)
      (syntax/loc stx 
        (define id 
-         (let* ([ast `(verimom id (arg ...) : (ret ...) contract ... stmt)]
-                [id (lambda (arg ...) (interpret ast (list arg ...)))])
+         (let* ([ast `(verimom id contract ... stmt)]
+                [id (lambda () (interpret ast))])
            (verimom-obj ast id))))]))
 
 
