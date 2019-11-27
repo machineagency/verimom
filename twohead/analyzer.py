@@ -84,7 +84,20 @@ class TestUtil():
     def statement_0():
         stats = LangUtil.prog_text_to_statements(prog_safe_r1_set)
         stat_dicts = map(lambda stat: LangUtil.stat_to_arg_dict(stat), stats)
-        return list(stat_dicts)
+        stat_dicts = list(stat_dicts)
+        print(stat_dicts)
+        ps = ProgSolver()
+        ps.write_clock_frozen_constraint()
+        for stat in stat_dicts:
+            ps.write_single_move_to_constraint(stat)
+        try:
+            for a in ps.assertions:
+                print(a)
+            ps.check()
+            return ps.model()
+        except Exception as e:
+            print(f'Could not solve: {e}')
+            return {}
 
 if __name__ == '__main__':
     print(TestUtil.statement_0())
