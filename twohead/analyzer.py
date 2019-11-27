@@ -17,6 +17,30 @@ class LangUtil():
                                      prog_text.split(';\n')))
         return stats_preclean
 
+    @staticmethod
+    def stat_to_arg_dict(statement):
+        instr = LangUtil.peek_instr(statement)
+        if instr == 'moveTo':
+            return LangUtil.parse_move_to(statement)
+        else:
+            print(f'Unrecognized instruction: {instr}')
+            return {}
+
+    @staticmethod
+    def peek_instr(statement):
+        return statement.split('(')[0]
+
+    @staticmethod
+    def parse_move_to(statement):
+        arg_lst = statement.replace('(', ',')\
+                           .replace(')', ',')\
+                           .split(',')[1:5]
+        return { 'x': arg_lst[0],\
+                 'y': arg_lst[1],\
+                 'z': arg_lst[2],\
+                 'r': arg_lst[3] }
+
+
 class TestUtil():
     def __init__(self):
         pass
