@@ -1,3 +1,5 @@
+from z3 import *
+
 prog_unsafe_r1_collide = """moveTo(150, 100, 0, 1);
 moveTo(100, 150, 0, 2);
 moveTo(150, 200, 0, 1);
@@ -40,6 +42,38 @@ class LangUtil():
                  'z': arg_lst[2],\
                  'r': arg_lst[3] }
 
+class ProgSolver():
+    def __init__(self):
+        self.s = z3.Solver()
+        self.clock_r1 = 0
+        self.clock_r2 = 0
+        self.SYM_VAR_CLOCK = Real('t')
+
+    def write_clock_frozen_constraint(self):
+        c = self.SYM_VAR_CLOCK == 0
+        self.s.add(c)
+        return c
+
+    def write_single_move_to_constraint(self, stat_dict):
+        time_cond = self.SYM_VAR_CLOCK == 0
+        x_cond = Real(f'r{stat_dict["r"]}x') == stat_dict['x']
+        y_cond = Real(f'r{stat_dict["r"]}y') == stat_dict['y']
+        c = Implies(time_cond, And(x_cond, y_cond))
+        self.s.add(c)
+        return c
+
+    @property
+    def assertions(self):
+        return [a for a in self.s.assertions()]
+
+    def check(self):
+        return self.s.check()
+
+    def model(self):
+        return self.s.model()
+
+    def solve(self):
+        return self.s.solve()
 
 class TestUtil():
     def __init__(self):
