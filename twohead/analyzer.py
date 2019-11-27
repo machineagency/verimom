@@ -1,6 +1,10 @@
-example_prog = """moveTo(150, 100, 0, 1);
+prog_unsafe_r1_collide = """moveTo(150, 100, 0, 1);
 moveTo(100, 150, 0, 2);
 moveTo(150, 200, 0, 1);
+"""
+
+prog_safe_r1_set = """moveTo(150, 100, 0, 1);
+moveTo(100, 150, 0, 2);
 """
 
 class LangUtil():
@@ -19,7 +23,9 @@ class TestUtil():
 
     @staticmethod
     def statement_0():
-        return LangUtil.prog_text_to_statements(example_prog)
+        stats = LangUtil.prog_text_to_statements(prog_safe_r1_set)
+        stat_dicts = map(lambda stat: LangUtil.stat_to_arg_dict(stat), stats)
+        return list(stat_dicts)
 
 if __name__ == '__main__':
     print(TestUtil.statement_0())
