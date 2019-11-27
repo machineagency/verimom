@@ -65,9 +65,29 @@ class ProgSolver():
         self.s.add(c)
         return c
 
+    def write_move_to_arm(self, stat_dict):
+        time_cond = self.SYM_VAR_CLOCK == 0
+        r1x = Real('r1x')
+        r1y = Real('r1y')
+        r2x = Real('r2x')
+        r2y = Real('r2y')
+        w = self.ROBOT_ARM_WIDTH
+        # Assuming ---r1---> <---r2---
+        if stat_dict["r"] == 1:
+            c = Not(And(r1x >= r2x, r1y >= r2y - w / 2, r1y <= r2y + w / 2))
+        else:
+            c = Not(And(r2x <= r1x, r2y >= r1y - w / 2, r2y <= r1y + w / 2))
+        c_with_time = Implies(time_cond, c)
+        self.s.add(c_with_time)
+        return c_with_time
+
     @property
     def assertions(self):
         return [a for a in self.s.assertions()]
+
+    @property
+    def unsat_core(self):
+        return self.s.unsat_core()
 
     def check(self):
         return self.s.check()
