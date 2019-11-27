@@ -37,10 +37,11 @@ class LangUtil():
         arg_lst = statement.replace('(', ',')\
                            .replace(')', ',')\
                            .split(',')[1:5]
-        return { 'x': arg_lst[0],\
-                 'y': arg_lst[1],\
-                 'z': arg_lst[2],\
-                 'r': arg_lst[3] }
+        return { 'x': int(arg_lst[0]),\
+                 'y': int(arg_lst[1]),\
+                 'z': int(arg_lst[2]),\
+                 'r': int(arg_lst[3])\
+        }
 
 class ProgSolver():
     def __init__(self):
