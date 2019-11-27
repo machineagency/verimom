@@ -46,16 +46,18 @@ class LangUtil():
 class ProgSolver():
     def __init__(self):
         self.s = z3.Solver()
+        self.s.set(':core.minimize', True)
         self.clock_r1 = 0
         self.clock_r2 = 0
+        self.ROBOT_ARM_WIDTH = 5
         self.SYM_VAR_CLOCK = Real('t')
 
-    def write_clock_frozen_constraint(self):
+    def write_clock_frozen(self):
         c = self.SYM_VAR_CLOCK == 0
         self.s.add(c)
         return c
 
-    def write_single_move_to_constraint(self, stat_dict):
+    def write_single_move_to(self, stat_dict):
         time_cond = self.SYM_VAR_CLOCK == 0
         x_cond = Real(f'r{stat_dict["r"]}x') == stat_dict['x']
         y_cond = Real(f'r{stat_dict["r"]}y') == stat_dict['y']
