@@ -75,9 +75,11 @@ class ProgSolver():
         w = self.ROBOT_ARM_WIDTH
         # Assuming ---r1---> <---r2---
         if stat_dict["r"] == 1:
-            c = Not(And(r1x >= r2x, r1y >= r2y - w / 2, r1y <= r2y + w / 2))
+            c = Not(And(stat_dict['x'] >= r2x, stat_dict['y'] >= r2y - w / 2,\
+                        stat_dict['y'] <= r2y + w / 2))
         else:
-            c = Not(And(r2x <= r1x, r2y >= r1y - w / 2, r2y <= r1y + w / 2))
+            c = Not(And(stat_dict['x'] <= r1x, stat_dict['y'] >= r1y - w / 2,\
+                        stat_dict['y'] <= r1y + w / 2))
         c_with_time = Implies(time_cond, c)
         self.s.assert_and_track(c_with_time, f'ARM<{stat_dict["statement"]}>')
         return c_with_time
