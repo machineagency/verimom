@@ -66,6 +66,46 @@ class ProgSolver():
         self.s.assert_and_track(c, f'SINGLE<{stat_dict["statement"]}>')
         return c
 
+    def write_pair_move_to(self, stat_dict0, stat_dict1):
+        if stat_dict0['r'] != stat_dict1['r']:
+            print('Error: cannot write a pair constraint with different arms:')
+            print(stat_dict0['statement'])
+            print(stat_dict1['statement'])
+            return None
+        time_cond = self.SYM_VAR_CLOCK == 0
+        r1x = Real('r1x')
+        r1y = Real('r1y')
+        r2x = Real('r2x')
+        r2y = Real('r2y')
+        w = self.ROBOT_ARM_WIDTH
+        x = stat_dict0['x']
+        xp = stat_dict1['x']
+        y = stat_dict0['y']
+        yp = stat_dict1['y']
+        max_y = max(stat_dict0['y'], stat_dict1['y'])
+        min_y = min(stat_dict0['y'], stat_dict1['y'])
+        # Assuming ---r1---> <---r2---
+        if stat_dict0['r'] == 1:
+            if xp >= x:
+                # infeasible region is ABOVE line, flipped for +y south
+                line_constr = -(r2x - x) * (yp - y) + (r2y - y) * (xp - x) >= 0
+            else:
+                # infeasible region is BELOW line, flipped for +y south
+                line_constr = -(r2x - x) * (yp - y) + (r2y - y) * (xp - x) <= 0
+            c = Not(And(r2y >= min_y - w / 2,\
+                        r2y >= max_y + w / 2,\
+                        line_constr))
+        else:
+            if xp >= x:
+                # infeasible region is ABOVE line, flipped for +y south
+                line_constr = -(r1x - x) * (yp - y) + (r1y - y) * (xp - x) >= 0
+            else:
+                # infeasible region is BELOW line, flipped for +y south
+                line_constr = -(r1x - x) * (yp - y) + (r1y - y) * (xp - x) <= 0
+            c = Not(And(r1y >= min_y - w / 2,\
+                        r1y >= max_y + w / 2,\
+                        line_const))
+
     def write_move_to_arm(self, stat_dict):
         time_cond = self.SYM_VAR_CLOCK == 0
         r1x = Real('r1x')
