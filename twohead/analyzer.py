@@ -40,7 +40,8 @@ class LangUtil():
         return { 'x': int(arg_lst[0]),\
                  'y': int(arg_lst[1]),\
                  'z': int(arg_lst[2]),\
-                 'r': int(arg_lst[3])\
+                 'r': int(arg_lst[3]),\
+                 'statement': statement\
         }
 
 class ProgSolver():
@@ -62,7 +63,7 @@ class ProgSolver():
         x_cond = Real(f'r{stat_dict["r"]}x') == stat_dict['x']
         y_cond = Real(f'r{stat_dict["r"]}y') == stat_dict['y']
         c = Implies(time_cond, And(x_cond, y_cond))
-        self.s.add(c)
+        self.s.assert_and_track(c, f'SINGLE<{stat_dict["statement"]}>')
         return c
 
     def write_move_to_arm(self, stat_dict):
@@ -78,7 +79,7 @@ class ProgSolver():
         else:
             c = Not(And(r2x <= r1x, r2y >= r1y - w / 2, r2y <= r1y + w / 2))
         c_with_time = Implies(time_cond, c)
-        self.s.add(c_with_time)
+        self.s.assert_and_track(c_with_time, f'ARM<{stat_dict["statement"]}>')
         return c_with_time
 
     @property
