@@ -44,6 +44,15 @@ class LangUtil():
                  'statement': statement\
         }
 
+    @staticmethod
+    def statements_to_dicts(statements):
+        return list(map(LangUtil.stat_to_arg_dict, statements))
+
+    @staticmethod
+    def bin_stat_dicts_by_r(dicts):
+        return [list(filter(lambda d: d['r'] == 1, dicts)),\
+                list(filter(lambda d: d['r'] == 2, dicts))]
+
 class ProgSolver():
     def __init__(self):
         self.s = z3.Solver()
@@ -146,14 +155,20 @@ class TestUtil():
         pass
 
     @staticmethod
+    def bin_test(prog):
+        stats = LangUtil.prog_text_to_statements(prog)
+        dicts = LangUtil.statements_to_dicts(stats)
+        bins = LangUtil.bin_stat_dicts_by_r(dicts)
+        return bins
+
+    @staticmethod
     def run_on_prog(prog):
         stats = LangUtil.prog_text_to_statements(prog)
-        stat_dicts = map(lambda stat: LangUtil.stat_to_arg_dict(stat), stats)
-        stat_dicts = list(stat_dicts)
+        dicts = LangUtil.statements_to_dicts(stats)
         # print(stat_dicts)
         ps = ProgSolver()
         ps.write_clock_frozen()
-        for stat in stat_dicts:
+        for stat in dicts:
             ps.write_single_move_to(stat)
             ps.write_move_to_arm(stat)
         try:
@@ -171,6 +186,8 @@ class TestUtil():
             return {}
 
 if __name__ == '__main__':
+    print("Testing binning on unsafe program.")
+    print(TestUtil.bin_test(prog_unsafe_r1_collide))
     print("Running on safe program.")
     print(TestUtil.run_on_prog(prog_safe_r1_set))
     print("Running on unsafe program.")
