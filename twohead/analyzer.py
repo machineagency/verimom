@@ -9,6 +9,14 @@ prog_safe_r1_set = """moveTo(150, 100, 0, 1);
 moveTo(100, 150, 0, 2);
 """
 
+prog_safe_longer = """moveTo(150, 100, 0, 1);
+moveTo(100, 150, 0, 2);
+moveTo(100, 160, 0, 2);
+moveTo(100, 170, 0, 2);
+moveTo(50, 100, 0, 1);
+moveTo(0, 0, 0, 1);
+"""
+
 class LangUtil():
     def __init__(self):
         pass
@@ -166,6 +174,28 @@ class TestUtil():
         return bins
 
     @staticmethod
+    def run_pairs_on_prog(prog):
+        stats = LangUtil.prog_text_to_statements(prog)
+        dicts = LangUtil.statements_to_dicts(stats)
+        bins = LangUtil.bin_stat_dicts_by_r(dicts)
+        ps = ProgSolver()
+        for r_bin in bins:
+            for idx in range(len(r_bin) - 1):
+                ps.write_pair_move_to(r_bin[idx], r_bin[idx + 1])
+        try:
+            # print(ps.assertions)
+            result = ps.check()
+            if result == unsat:
+                print('UNSAT')
+                print(f'Minimal unsatisfiable core: {ps.unsat_core}')
+                return {}
+            print('SAT')
+            return ps.model()
+        except Exception as e:
+            print(f'Error during solving: {e}')
+            return {}
+
+    @staticmethod
     def run_on_prog(prog):
         stats = LangUtil.prog_text_to_statements(prog)
         dicts = LangUtil.statements_to_dicts(stats)
@@ -196,4 +226,6 @@ if __name__ == '__main__':
     print(TestUtil.run_on_prog(prog_safe_r1_set))
     print("Running on unsafe program.")
     print(TestUtil.run_on_prog(prog_unsafe_r1_collide))
+    print("Running pairs on longer program.")
+    print(TestUtil.run_pairs_on_prog(prog_safe_longer))
 
