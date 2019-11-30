@@ -114,6 +114,10 @@ class ProgSolver():
             c = Not(And(r1y >= min_y - w / 2,\
                         r1y >= max_y + w / 2,\
                         line_const))
+        c_with_time = Implies(time_cond, c)
+        self.s.assert_and_track(c_with_time,\
+                f'PAIR<{stat_dict0["statement"]}, {stat_dict1["statement"]}>')
+        return c_with_time
 
     def write_move_to_arm(self, stat_dict):
         time_cond = self.SYM_VAR_CLOCK == 0
