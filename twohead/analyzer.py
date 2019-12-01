@@ -17,6 +17,15 @@ moveTo(50, 100, 0, 1);
 moveTo(0, 0, 0, 1);
 """
 
+prog_unsafe_longer = """moveTo(150, 100, 0, 1);
+moveTo(100, 150, 0, 2);
+moveTo(100, 160, 0, 2);
+moveTo(100, 170, 0, 2);
+moveTo(50, 100, 0, 1);
+moveTo(0, 0, 0, 1);
+moveTo(101, 171, 0, 1);
+"""
+
 class LangUtil():
     def __init__(self):
         pass
@@ -226,6 +235,8 @@ if __name__ == '__main__':
     print(TestUtil.run_on_prog(prog_safe_r1_set))
     print("Running on unsafe program.")
     print(TestUtil.run_on_prog(prog_unsafe_r1_collide))
-    print("Running pairs on longer program.")
+    print("Running pairs on longer safe program.")
     print(TestUtil.run_pairs_on_prog(prog_safe_longer))
+    print("Running pairs on longer unsafe program.")
+    print(TestUtil.run_pairs_on_prog(prog_unsafe_longer))
 
