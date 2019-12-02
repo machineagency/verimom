@@ -26,6 +26,12 @@ moveTo(0, 0, 0, 1);
 moveTo(101, 171, 0, 1);
 """
 
+prog_unsafe_cross = """moveTo(0, 0, 0, 1);
+moveTo(300, 0, 0, 2);
+moveTo(300, 300, 0, 1);
+moveTo(0, 300, 0, 2);
+"""
+
 class LangUtil():
     def __init__(self):
         pass
@@ -76,20 +82,38 @@ class ProgSolver():
         self.s.set(':core.minimize', True)
         self.clock_r1 = 0
         self.clock_r2 = 0
+        self.curr_r1x = 0
+        self.curr_r1y = 0
+        self.curr_r2x = 0
+        self.curr_r2y = 0
         self.ROBOT_ARM_WIDTH = 5
         self.SYM_VAR_CLOCK = Real('t')
+        self.r1x = Function('r1x', RealSort(), RealSort())
+        self.r1y = Function('r1y', RealSort(), RealSort())
+        self.r2x = Function('r2x', RealSort(), RealSort())
+        self.r2y = Function('r2y', RealSort(), RealSort())
 
     def write_clock_frozen(self):
         c = self.SYM_VAR_CLOCK == 0
         self.s.add(c)
         return c
 
-    def write_single_move_to(self, stat_dict):
+    def write_work_envelope(self, x_lim, y_lim):
+        self.s.assert_and_track(And(Real('r1x') <= x_lim, Real('r1x') >= 0),
+                                        f'WORK_ENV: x <= {x_lim} for r1')
+        self.s.assert_and_track(And(Real('r2x') <= x_lim, Real('r2x') >= 0),
+                                        f'WORK_ENV: x <= {x_lim} for r2')
+        self.s.assert_and_track(And(Real('r1y') <= y_lim, Real('r1x') >= 0),
+                                        f'WORK_ENV: y <= {y_lim} for r1')
+        self.s.assert_and_track(And(Real('r2y') <= y_lim, Real('r2y') >= 0),
+                                        f'WORK_ENV: y <= {y_lim} for r2')
+
+    def write_dest_pos(self, stat_dict):
         time_cond = self.SYM_VAR_CLOCK == 0
         x_cond = Real(f'r{stat_dict["r"]}x') == stat_dict['x']
         y_cond = Real(f'r{stat_dict["r"]}y') == stat_dict['y']
         c = Implies(time_cond, And(x_cond, y_cond))
-        self.s.assert_and_track(c, f'SINGLE<{stat_dict["statement"]}>')
+        self.s.assert_and_track(c, f'DEST_POS<{stat_dict["statement"]}>')
         return c
 
     def write_pair_move_to(self, stat_dict0, stat_dict1):
@@ -119,7 +143,7 @@ class ProgSolver():
                 # infeasible region is BELOW line, flipped for +y south
                 line_constr = -(r2x - x) * (yp - y) + (r2y - y) * (xp - x) <= 0
             c = Not(And(r2y >= min_y - w / 2,\
-                        r2y >= max_y + w / 2,\
+                        r2y <= max_y + w / 2,\
                         line_constr))
         else:
             if xp >= x:
@@ -129,7 +153,7 @@ class ProgSolver():
                 # infeasible region is BELOW line, flipped for +y south
                 line_constr = -(r1x - x) * (yp - y) + (r1y - y) * (xp - x) <= 0
             c = Not(And(r1y >= min_y - w / 2,\
-                        r1y >= max_y + w / 2,\
+                        r1y <= max_y + w / 2,\
                         line_constr))
         c_with_time = Implies(time_cond, c)
         self.s.assert_and_track(c_with_time,\
@@ -188,6 +212,10 @@ class TestUtil():
         dicts = LangUtil.statements_to_dicts(stats)
         bins = LangUtil.bin_stat_dicts_by_r(dicts)
         ps = ProgSolver()
+        ps.write_clock_frozen()
+        ps.write_work_envelope(300, 300)
+        for r_dict in dicts:
+            ps.write_dest_pos(r_dict)
         for r_bin in bins:
             for idx in range(len(r_bin) - 1):
                 ps.write_pair_move_to(r_bin[idx], r_bin[idx + 1])
@@ -211,8 +239,9 @@ class TestUtil():
         # print(stat_dicts)
         ps = ProgSolver()
         ps.write_clock_frozen()
+        ps.write_work_envelope(300, 300)
         for stat in dicts:
-            ps.write_single_move_to(stat)
+            ps.write_dest_pos(stat)
             ps.write_move_to_arm(stat)
         try:
             # for a in ps.assertions:
@@ -239,4 +268,6 @@ if __name__ == '__main__':
     print(TestUtil.run_pairs_on_prog(prog_safe_longer))
     print("Running pairs on longer unsafe program.")
     print(TestUtil.run_pairs_on_prog(prog_unsafe_longer))
+    print("Running pairs on bad cross program.")
+    print(TestUtil.run_pairs_on_prog(prog_unsafe_cross))
 
