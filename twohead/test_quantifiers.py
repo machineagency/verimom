@@ -72,8 +72,10 @@ r1y = Function('r1y', RealSort(), RealSort())
 r2x = Function('r2x', RealSort(), RealSort())
 r2y = Function('r2y', RealSort(), RealSort())
 
-s.add(And(x >= 0, x <= 10))
-s.add(And(y >= 0, y <= 10))
+s.add(And(r1x(t) >= 0, r1x(t) <= 10))
+s.add(And(r2x(t) >= 0, r2x(t) <= 10))
+s.add(And(r1y(t) >= 0, r1y(t) <= 10))
+s.add(And(r2y(t) >= 0, r2y(t) <= 10))
 s.add(And(t >= 0, t <= 10))
 
 s.add(Implies(t == 0, r1x(t) == 0))
@@ -91,8 +93,9 @@ s.add(ForAll([t], Implies(And(t >= 5 * sqrt(2)), r2y(t) == 5)))
 s.add(ForAll([t], Implies(And(t > 0, t < 5 * sqrt(2)), r1x(t) == (3/2) * t)))
 s.add(ForAll([t], Implies(And(t > 0, t < 5 * sqrt(2)), r1y(t) == 0)))
 s.add(ForAll([t], Implies(And(t >= 5 * sqrt(2)), r1x(t) == 15/2)))
-s.add(ForAll([t], Implies(And(t >= 5 * sqrt(2)), r1y(t) == 2 * t - 5)))
+s.add(ForAll([t], Implies(And(t >= 5 * sqrt(2)), r1y(t) == 2 * t - 10)))
 
+s.push()
 collision = And(r1x(t) == r2x(t), r1y(t) == r2y(t))
 s.add(collision)
 
@@ -103,4 +106,19 @@ if s.check() == sat:
 else:
     print('No collision.')
 
+# Arm constraints: when I, r1, move, r2 cannot have a pos in my bounds
+# !! Remove exact position constraint first otherwise we have guaranteed unsat
+s.pop()
+w = 1
+s.add(Implies(t >= 5 * sqrt(2), And(r2x(t) <= r1x(t),\
+                                    r2y(t) >= r1y(t) - w / 2,\
+                                    r2y(t) <= r1y(t) + w / 2)))
+
+print('Running r1 crash with arm constraints, should NOT pass.')
+# print(s.assertions())
+if s.check() == sat:
+    print(s.model())
+    print(f'Collision t-val: {s.model()[t]}')
+else:
+    print('No collision.')
 
