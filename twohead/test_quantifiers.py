@@ -110,9 +110,9 @@ else:
 # !! Remove exact position constraint first otherwise we have guaranteed unsat
 s.pop()
 w = 1
-s.add(Implies(t >= 5 * sqrt(2), And(r2x(t) <= r1x(t),\
-                                    r2y(t) >= r1y(t) - w / 2,\
-                                    r2y(t) <= r1y(t) + w / 2)))
+s.add(And(r2x(t) <= r1x(t),\
+          r2y(t) >= r1y(t) - w / 2,\
+          r2y(t) <= r1y(t) + w / 2))
 
 print('Running r1 crash with arm constraints, should NOT pass.')
 # print(s.assertions())
