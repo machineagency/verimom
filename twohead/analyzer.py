@@ -198,6 +198,34 @@ class ProgSolver():
             self._curr_r2y = stat_dict['y']
             self._clock_r2 += time_taken
 
+    def write_time_constraint(self):
+        """
+        Only call after calling write_pos_move_to on all statements.
+        """
+        self.s.assert_and_track(self.t >= 0, 'START T: 0')
+        self.s.assert_and_track(self.t <= max(self._clock_r1, self._clock_r2),\
+                f'END T: {max(self._clock_r1, self._clock_r2)}')
+
+    def write_extend_final_pos_to_end_time(self):
+        """
+        Only call after calling write_pos_move_to on all statements.
+        """
+        r1x = self.r1x
+        r1y = self.r1y
+        r2x = self.r2x
+        r2y = self.r2y
+        t = self.t
+        max_clock = max(self._clock_r1, self._clock_r2)
+        if (self._clock_r1 < max_clock):
+            self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r1,\
+                    r1x(t) == self._curr_r1x)), 'R1X EXTEND')
+            self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r1,\
+                    r1y(t) == self._curr_r1y)), 'R2Y EXTEND')
+        if (self._clock_r2 < max_clock):
+            self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r2,\
+                    r2x(t) == self._curr_r2x)), 'R2X EXTEND')
+            self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r2,\
+                    r2y(t) == self._curr_r2y)), 'R2Y EXTEND')
 
     @property
     def assertions(self):
