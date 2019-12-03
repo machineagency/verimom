@@ -115,7 +115,7 @@ s.add(And(r2x(t) <= r1x(t),\
           r2y(t) <= r1y(t) + w / 2))
 
 print('Running r1 crash with arm constraints, should NOT pass.')
-# print(s.assertions())
+print(s.assertions())
 if s.check() == sat:
     print(s.model())
     print(f'Collision t-val: {s.model()[t]}')

@@ -287,35 +287,39 @@ class TestUtil():
         dicts = LangUtil.statements_to_dicts(stats)
         # print(stat_dicts)
         ps = ProgSolver()
+        set_option(rational_to_decimal=True)
         ps.write_work_envelope()
         ps.write_pos_initial()
+        ps.write_arm_constraints()
         for stat in dicts:
             ps.write_pos_move_to(stat)
-            # TODO: arm constr
+        ps.write_time_constraint()
+        ps.write_extend_final_pos_to_end_time()
         try:
             # print(ps.assertions)
             result = ps.check()
             if result == unsat:
                 print('UNSAT')
-                print(f'Minimal unsatisfiable core: {ps.unsat_core}')
+                # print(f'Minimal unsatisfiable core: {ps.unsat_core}')
                 return {}
             print('SAT')
-            return ps.model()
+            return ps.model()[ps.t]
+            # return ps.model()
         except Exception as e:
             print(f'Error during solving: {e}')
             return {}
 
 if __name__ == '__main__':
-    print("Testing binning on unsafe program.")
-    print(TestUtil.bin_test(prog_unsafe_r1_collide))
+    # print("Testing binning on unsafe program.")
+    # print(TestUtil.bin_test(prog_unsafe_r1_collide))
     print("Running on safe program.")
     print(TestUtil.run_on_prog(prog_safe_r1_set))
     print("Running on unsafe program.")
     print(TestUtil.run_on_prog(prog_unsafe_r1_collide))
-    # print("Running pairs on longer safe program.")
-    # print(TestUtil.run_pairs_on_prog(prog_safe_longer))
-    # print("Running pairs on longer unsafe program.")
-    # print(TestUtil.run_pairs_on_prog(prog_unsafe_longer))
-    # print("Running pairs on bad cross program.")
-    # print(TestUtil.run_pairs_on_prog(prog_unsafe_cross))
+    print("Running on longer safe program.")
+    print(TestUtil.run_on_prog(prog_safe_longer))
+    print("Running on longer unsafe program.")
+    print(TestUtil.run_on_prog(prog_unsafe_longer))
+    print("Running on bad cross program.")
+    print(TestUtil.run_on_prog(prog_unsafe_cross))
 
