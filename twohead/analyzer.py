@@ -78,20 +78,67 @@ class LangUtil():
 
 class ProgSolver():
     def __init__(self):
+        """
+        Naming convention:
+
+        s - the z3 solver
+        VAR_NAME - concrete constant
+        _var_name - concrete mutable variable
+        var_name - symbolic (z3) variable (constant)
+        """
         self.s = z3.Solver()
         self.s.set(':core.minimize', True)
-        self.clock_r1 = 0
-        self.clock_r2 = 0
-        self.curr_r1x = 0
-        self.curr_r1y = 0
-        self.curr_r2x = 0
-        self.curr_r2y = 0
         self.ROBOT_ARM_WIDTH = 5
-        self.SYM_VAR_CLOCK = Real('t')
+        self.X_LIM = 100
+        self.Y_LIM = 100
+        self.R1_INIT_X = 0
+        self.R1_INIT_Y = 0
+        self.R2_INIT_X = 0
+        self.R2_INIT_Y = 0
+        self._clock_r1 = 0
+        self._clock_r2 = 0
+        self._curr_r1x = 0
+        self._curr_r1y = 0
+        self._curr_r2x = 0
+        self._curr_r2y = 0
         self.r1x = Function('r1x', RealSort(), RealSort())
         self.r1y = Function('r1y', RealSort(), RealSort())
         self.r2x = Function('r2x', RealSort(), RealSort())
         self.r2y = Function('r2y', RealSort(), RealSort())
+        self.t = Real('t')
+
+    def write_work_envelope(self):
+        r1x = self.r1x
+        r1y = self.r1y
+        r2x = self.r2x
+        r2y = self.r2y
+        t = self.t
+        self.s.assert_and_track(And(r1x(t) >= 0, r1x(t) <= self.X_LIM),
+                                f'WORK_ENV: r1x in [0, {self.X_LIM}]')
+        self.s.assert_and_track(And(r2x(t) >= 0, r2x(t) <= self.X_LIM),
+                                f'WORK_ENV: r2x in [0, {self.X_LIM}]')
+        self.s.assert_and_track(And(r1y(t) >= 0, r1y(t) <= self.Y_LIM),
+                                f'WORK_ENV: r1y in [0, {self.Y_LIM}]')
+        self.s.assert_and_track(And(r2y(t) >= 0, r2y(t) <= self.Y_LIM),
+                                f'WORK_ENV: r2y in [0, {self.Y_LIM}]')
+
+    def write_pos_initial(self):
+        r1x = self.r1x
+        r1y = self.r1y
+        r2x = self.r2x
+        r2y = self.r2y
+        t = self.t
+        self.s.assert_and_track((Implies(t == 0), r1x(t) == self.R1_INIT_X),
+                                f'R1_INIT_X: {self.R1_INIT_X}')
+        self.s.assert_and_track((Implies(t == 0), r1y(t) == self.R1_INIT_Y),
+                                f'R1_INIT_Y: {self.R1_INIT_Y}')
+        self.s.assert_and_track((Implies(t == 0), r1x(t) == self.R2_INIT_X),
+                                f'R2_INIT_X: {self.R2_INIT_X}')
+        self.s.assert_and_track((Implies(t == 0), r1x(t) == self.R2_INIT_Y),
+                                f'R2_INIT_Y: {self.R2_INIT_Y}')
+
+    def write_pos_move_to(self, stat_dict):
+        pass
 
     @property
     def assertions(self):
