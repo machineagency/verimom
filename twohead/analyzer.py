@@ -90,18 +90,19 @@ class ProgSolver():
         self.s = z3.Solver()
         self.s.set(':core.minimize', True)
         self.ROBOT_ARM_WIDTH = 5
-        self.X_LIM = 100
-        self.Y_LIM = 100
+        self.X_LIM = 300
+        self.Y_LIM = 300
         self.R1_INIT_X = 0
         self.R1_INIT_Y = 0
-        self.R2_INIT_X = 0
+        self.R2_INIT_X = 100
         self.R2_INIT_Y = 0
+        self.VELOCITY = 1
         self._clock_r1 = 0
         self._clock_r2 = 0
-        self._curr_r1x = 0
-        self._curr_r1y = 0
-        self._curr_r2x = 0
-        self._curr_r2y = 0
+        self._curr_r1x = self.R1_INIT_X
+        self._curr_r1y = self.R1_INIT_Y
+        self._curr_r2x = self.R2_INIT_X
+        self._curr_r2y = self.R2_INIT_Y
         self.r1x = Function('r1x', RealSort(), RealSort())
         self.r1y = Function('r1y', RealSort(), RealSort())
         self.r2x = Function('r2x', RealSort(), RealSort())
