@@ -94,7 +94,7 @@ class ProgSolver():
         self.Y_LIM = 300
         self.R1_INIT_X = 0
         self.R1_INIT_Y = 0
-        self.R2_INIT_X = 100
+        self.R2_INIT_X = self.X_LIM
         self.R2_INIT_Y = 0
         self.VELOCITY = 1
         self._clock_r1 = 0
@@ -220,7 +220,7 @@ class ProgSolver():
             self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r1,\
                     r1x(t) == self._curr_r1x)), 'R1X EXTEND')
             self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r1,\
-                    r1y(t) == self._curr_r1y)), 'R2Y EXTEND')
+                    r1y(t) == self._curr_r1y)), 'R1Y EXTEND')
         if (self._clock_r2 < max_clock):
             self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r2,\
                     r2x(t) == self._curr_r2x)), 'R2X EXTEND')
