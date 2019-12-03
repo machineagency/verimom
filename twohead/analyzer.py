@@ -156,7 +156,48 @@ class ProgSolver():
             f'ARM')
 
     def write_pos_move_to(self, stat_dict):
-        pass
+        if stat_dict['r'] == 1:
+            x_old = self._curr_r1x
+            y_old = self._curr_r1y
+            t_old = self._clock_r1
+            x = self.r1x
+            y = self.r1y
+        else:
+            x_old = self._curr_r2x
+            y_old = self._curr_r2y
+            t_old = self._clock_r2
+            x = self.r2x
+            y = self.r2y
+
+        x_new = stat_dict['x']
+        y_new = stat_dict['y']
+        dist = sqrt((x_new - x_old) ** 2 + (y_new - y_old) ** 2)
+        time_taken = self.VELOCITY * dist
+        t_new = t_old + time_taken
+        t = self.t
+
+        # Calculate line in y = ... and x = ... forms interpolating endpoints
+        self.s.assert_and_track(ForAll([t],\
+            Implies(And(t > t_old, t <= t_new),\
+                x(t) == (1 - (t - t_old) / time_taken) * x_old\
+                    + ((t - t_old) / time_taken) * x_new)),\
+                f'POS_X: for r{stat_dict["r"]} on t in ({t_old}, {t_new}]')
+        self.s.assert_and_track(ForAll([t],\
+            Implies(And(t > t_old, t <= t_new),\
+                y(t) == (1 - (t - t_old) / time_taken) * y_old\
+                    + ((t - t_old) / time_taken) * y_new)),\
+                f'POS_Y: for r{stat_dict["r"]} on t in ({t_old}, {t_new}]')
+
+        # Update (x, y, t)
+        if stat_dict['r'] == 1:
+            self._curr_r1x = stat_dict['x']
+            self._curr_r1y = stat_dict['y']
+            self._clock_r1 += time_taken
+        else:
+            self._curr_r2x = stat_dict['x']
+            self._curr_r2y = stat_dict['y']
+            self._clock_r2 += time_taken
+
 
     @property
     def assertions(self):
