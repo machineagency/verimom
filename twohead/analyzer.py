@@ -128,13 +128,13 @@ class ProgSolver():
         r2x = self.r2x
         r2y = self.r2y
         t = self.t
-        self.s.assert_and_track((Implies(t == 0), r1x(t) == self.R1_INIT_X),
+        self.s.assert_and_track(Implies(t == 0, r1x(t) == self.R1_INIT_X),
                                 f'R1_INIT_X: {self.R1_INIT_X}')
-        self.s.assert_and_track((Implies(t == 0), r1y(t) == self.R1_INIT_Y),
+        self.s.assert_and_track(Implies(t == 0, r1y(t) == self.R1_INIT_Y),
                                 f'R1_INIT_Y: {self.R1_INIT_Y}')
-        self.s.assert_and_track((Implies(t == 0), r1x(t) == self.R2_INIT_X),
+        self.s.assert_and_track(Implies(t == 0, r1x(t) == self.R2_INIT_X),
                                 f'R2_INIT_X: {self.R2_INIT_X}')
-        self.s.assert_and_track((Implies(t == 0), r1x(t) == self.R2_INIT_Y),
+        self.s.assert_and_track(Implies(t == 0, r1x(t) == self.R2_INIT_Y),
                                 f'R2_INIT_Y: {self.R2_INIT_Y}')
 
     def write_pos_move_to(self, stat_dict):
@@ -200,14 +200,13 @@ class TestUtil():
         dicts = LangUtil.statements_to_dicts(stats)
         # print(stat_dicts)
         ps = ProgSolver()
-        ps.write_clock_frozen()
-        ps.write_work_envelope(300, 300)
+        ps.write_work_envelope()
+        ps.write_pos_initial()
         for stat in dicts:
-            ps.write_dest_pos(stat)
-            ps.write_move_to_arm(stat)
+            ps.write_pos_move_to(stat)
+            # TODO: arm constr
         try:
-            # for a in ps.assertions:
-            #     print(a)
+            # print(ps.assertions)
             result = ps.check()
             if result == unsat:
                 print('UNSAT')
@@ -226,10 +225,10 @@ if __name__ == '__main__':
     print(TestUtil.run_on_prog(prog_safe_r1_set))
     print("Running on unsafe program.")
     print(TestUtil.run_on_prog(prog_unsafe_r1_collide))
-    print("Running pairs on longer safe program.")
-    print(TestUtil.run_pairs_on_prog(prog_safe_longer))
-    print("Running pairs on longer unsafe program.")
-    print(TestUtil.run_pairs_on_prog(prog_unsafe_longer))
-    print("Running pairs on bad cross program.")
-    print(TestUtil.run_pairs_on_prog(prog_unsafe_cross))
+    # print("Running pairs on longer safe program.")
+    # print(TestUtil.run_pairs_on_prog(prog_safe_longer))
+    # print("Running pairs on longer unsafe program.")
+    # print(TestUtil.run_pairs_on_prog(prog_unsafe_longer))
+    # print("Running pairs on bad cross program.")
+    # print(TestUtil.run_pairs_on_prog(prog_unsafe_cross))
 
