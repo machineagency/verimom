@@ -139,6 +139,22 @@ class ProgSolver():
         self.s.assert_and_track(Implies(t == 0, r1x(t) == self.R2_INIT_Y),
                                 f'R2_INIT_Y: {self.R2_INIT_Y}')
 
+    def write_arm_constraints(self):
+        r1x = self.r1x
+        r1y = self.r1y
+        r2x = self.r2x
+        r2y = self.r2y
+        t = self.t
+        w = self.ROBOT_ARM_WIDTH
+        self.s.assert_and_track(And(\
+            And(r2x(t) <= r1x(t),\
+                r2y(t) >= r1y(t) - w / 2,\
+                r2y(t) <= r1y(t) + w / 2),
+            And(r1x(t) >= r2x(t),\
+                r1y(t) >= r2y(t) - w / 2,\
+                r1y(t) <= r2y(t) + w / 2)),\
+            f'ARM')
+
     def write_pos_move_to(self, stat_dict):
         pass
 
