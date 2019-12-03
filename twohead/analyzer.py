@@ -1,4 +1,5 @@
 from z3 import *
+from math import *
 
 prog_unsafe_r1_collide = """moveTo(150, 100, 0, 1);
 moveTo(100, 150, 0, 2);
