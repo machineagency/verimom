@@ -466,6 +466,12 @@ class TestUtil():
             print(f'Error during solving: {e}')
             return {}
 
+    @staticmethod
+    def test_equiv(prog_t, prog_r):
+        analyzer = Analyzer((300, 300), (0, 0), (300, 0))
+        # return analyzer.check_equivalent(prog_t, prog_t)
+        return analyzer.check_equivalent_nosmt(prog_t, prog_r)
+
 if __name__ == '__main__':
     # print("Testing binning on unsafe program.")
     # print(TestUtil.bin_test(prog_unsafe_r1_collide))
@@ -477,12 +483,18 @@ if __name__ == '__main__':
     # print(TestUtil.run_on_prog(prog_safe_longer))
     # print("Running on longer unsafe program.")
     # print(TestUtil.run_on_prog(prog_unsafe_longer))
-    print("Running on bad cross program.")
-    print(TestUtil.run_on_prog(prog_unsafe_cross))
-    print("Running on safe program with sleep.")
-    print(TestUtil.run_on_prog(prog_safe_sleep_before_collide))
-    print("Running on unsafe program with sleep.")
-    print(TestUtil.run_on_prog(prog_unsafe_not_enough_sleep_before_collide))
-    print("Running on safe but slow prog.")
-    print(TestUtil.run_on_prog(prog_safe_easy_optimize))
+    # print("Running on bad cross program.")
+    # print(TestUtil.run_on_prog(prog_unsafe_cross))
+    # print("Running on safe program with sleep.")
+    # print(TestUtil.run_on_prog(prog_safe_sleep_before_collide))
+    # print("Running on unsafe program with sleep.")
+    # print(TestUtil.run_on_prog(prog_unsafe_not_enough_sleep_before_collide))
+    # print("Running on safe but slow prog.")
+    # print(TestUtil.run_on_prog(prog_safe_easy_optimize))
+    print("Testing equivalence with safe prog on itself.")
+    print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_r1_set))
+    print("Testing equivalence with safe prog on reverse version")
+    print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_r1_set_rev))
+    print("Testing equivalence with safe prog and non-equiv unsafe")
+    print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_longer))
 

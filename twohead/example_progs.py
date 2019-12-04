@@ -7,6 +7,10 @@ prog_safe_r1_set = """moveTo(150, 100, 0, 1);
 moveTo(100, 150, 0, 2);
 """
 
+prog_safe_r1_set_rev = """moveTo(150, 100, 0, 2);
+moveTo(100, 150, 0, 1);
+"""
+
 prog_safe_longer = """moveTo(150, 100, 0, 1);
 moveTo(100, 150, 0, 2);
 moveTo(100, 160, 0, 2);
