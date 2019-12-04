@@ -306,7 +306,20 @@ class Analyzer():
 
         @staticmethod
         def check_equivalent(prog_target, prog_rewrite):
-            pass
+            prog_texts = (prog_target, prog_rewrite)
+            ps = ProgSolver()
+            for p in range(0, 2):
+                stats = LangUtil.prog_text_to_statements(prog_texts[p])
+                dicts = LangUtil.stat_to_arg_dict(stats)
+                ps.write_indices_constraints()
+                ps.write_all_index_positions(dicts)
+                ps.write_equiv_constraint()
+            try:
+                result = ps.check()
+                return result != unsat
+            except Exception as e:
+                print(f'Error during solving: {e}')
+                return False
 
 class TestUtil():
     def __init__(self):
