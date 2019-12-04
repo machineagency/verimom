@@ -303,6 +303,10 @@ class Analyzer():
             print(f'Error during solving: {e}')
             return False
 
+        @staticmethod
+        def check_equivalent(prog_target, prog_rewrite):
+            pass
+
 class TestUtil():
     def __init__(self):
         pass
