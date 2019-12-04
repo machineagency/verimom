@@ -204,12 +204,12 @@ class ProgSolver():
             Implies(And(t > t_old, t <= t_new),\
                 x(t) == (1 - (t - t_old) / time_taken) * x_old\
                     + ((t - t_old) / time_taken) * x_new)),\
-                f'POS_X: for r{stat_dict["r"]} on t in ({t_old}, {t_new}]')
+                f'POS_X: R{stat_dict["r"]} {x_old} -> {x_new}')
         self.s.assert_and_track(ForAll([t],\
             Implies(And(t > t_old, t <= t_new),\
                 y(t) == (1 - (t - t_old) / time_taken) * y_old\
                     + ((t - t_old) / time_taken) * y_new)),\
-                f'POS_Y: for r{stat_dict["r"]} on t in ({t_old}, {t_new}]')
+                f'POS_Y: R{stat_dict["r"]} {y_old} -> {y_new}')
 
         # Update (x, y, t)
         if stat_dict['r'] == 1:
