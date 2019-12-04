@@ -221,6 +221,31 @@ class ProgSolver():
             self._curr_r2y = stat_dict['y']
             self._clock_r2 += time_taken
 
+    def write_sleep(self, stat_dict):
+        if stat_dict['r'] == 1:
+            x_curr = self._curr_r1x
+            y_curr = self._curr_r1y
+            t_curr = self._clock_r1
+            x = self.r1x
+            y = self.r1y
+        else:
+            x_curr = self._curr_r2x
+            y_curr = self._curr_r2y
+            t_curr = self._clock_r2
+            x = self.r2x
+            y = self.r2y
+        t = self.t
+        new_t = t_curr + stat_dict['s']
+        self.s.assert_and_track(ForAll([t], Implies(And(t > t_curr, t <= new_t),\
+            x(t) == x_curr)), f'SLEEP R{stat_dict["r"]}X: ({t_curr}, {new_t}]')
+        self.s.assert_and_track(ForAll([t], Implies(And(t > t_curr, t <= new_t),\
+            y(t) == y_curr)), f'SLEEP R{stat_dict["r"]}Y: ({t_curr}, {new_t}]')
+
+        if stat_dict['r'] == 1:
+            self._clock_r1 += stat_dict['s']
+        else:
+            self._clock_r2 += stat_dict['s']
+
     def write_time_constraint(self):
         """
         Only call after calling write_pos_move_to on all statements.
