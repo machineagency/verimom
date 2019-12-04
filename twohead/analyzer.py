@@ -60,6 +60,16 @@ class LangUtil():
         return [list(filter(lambda d: d['r'] == 1, dicts)),\
                 list(filter(lambda d: d['r'] == 2, dicts))]
 
+    @staticmethod
+    def dicts_to_points(dicts):
+        # TODO: handle sleep, travel, merging
+        pts = []
+        for i in range(0, len(dicts)):
+            curr_dict = dicts[i]
+            if curr_dict['instr'] == 'moveTo':
+                pts.append((curr_dict['x'], curr_dict['y']))
+        return sorted(pts, key=lambda xy: [xy[0], xy[1]])
+
 class ProgSolver():
     def __init__(self):
         """
@@ -344,8 +354,7 @@ class Analyzer():
         self.init_pos_r2 = init_pos_r2
 
     # TODO: interactively block out collision points to check num of collisions
-    @staticmethod
-    def check_collision(prog):
+    def check_collision(self, prog):
         """
         Returns False if no collision, otherwise the (x, y, t) of collision
         """
@@ -373,6 +382,18 @@ class Analyzer():
         except Exception as e:
             print(f'Error during solving: {e}')
             return False
+
+    # TODO: handle splitting and merging segments
+    def check_equivalent_nosmt(self, prog_target, prog_rewrite):
+        stats_t = LangUtil.prog_text_to_statements(prog_target)
+        stats_r = LangUtil.prog_text_to_statements(prog_rewrite)
+        dicts_t = LangUtil.statements_to_dicts(stats_t)
+        dicts_r = LangUtil.statements_to_dicts(stats_r)
+        # bins_t = LangUtil.bin_stat_dicts_by_r(dicts_t)
+        # bins_r = LangUtil.bin_stat_dicts_by_r(dicts_r)
+        pts_t = LangUtil.dicts_to_points(dicts_t)
+        pts_r = LangUtil.dicts_to_points(dicts_r)
+        return pts_t == pts_r
 
     # TODO: handle splitting and merging segments
     def check_equivalent(self, prog_target, prog_rewrite):
