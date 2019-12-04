@@ -132,6 +132,16 @@ class ProgSolver():
         self.r2y = Function('r2y', RealSort(), RealSort())
         self.t = Real('t')
 
+    def set_work_envelope_setting(self, tup):
+        self.X_LIM = tup[0]
+        self.Y_LIM = tup[1]
+
+    def set_init_pos_setting(self, tup_r1, tup_r2):
+        self.R1_INIT_X = tup_r1[0]
+        self.R1_INIT_Y = tup_r1[1]
+        self.R2_INIT_X = tup_r2[0]
+        self.R2_INIT_Y = tup_r2[1]
+
     def write_work_envelope(self):
         r1x = self.r1x
         r1y = self.r1y
