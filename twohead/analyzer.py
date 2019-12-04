@@ -302,6 +302,47 @@ class ProgSolver():
     def solve(self):
         return self.s.solve()
 
+class Analyzer():
+    def __init__(self, work_envelope, init_pos_r1, init_pos_r2):
+        """
+        work_envelope - (x_max, y_max)
+        init_pos_r1 - (x, y)
+        init_pos_r2 - (x, y)
+        """
+        self.work_envelope = work_envelope
+        self.init_pos_r1 = init_pos_r1
+        self.init_pos_r2 = init_pos_r2
+
+    @staticmethod
+    def check_collision(prog):
+        """
+        Returns False if no collision, otherwise the (x, y, t) of collision
+        """
+        stats = LangUtil.prog_text_to_statements(prog)
+        dicts = LangUtil.statements_to_dicts(stats)
+        ps = ProgSolver()
+        ps.set_work_envelope_setting(self.work_envelope)
+        ps.set_init_pos_setting(self.init_pos_r1, self.init_pos_r2)
+        set_option(rational_to_decimal=True)
+        ps.write_work_envelope()
+        ps.write_pos_initial()
+        ps.write_arm_constraints()
+        for stat in dicts:
+            if stat['instr'] == 'moveTo':
+                ps.write_pos_move_to(stat)
+            elif stat['instr'] == 'sleep':
+                ps.write_sleep(stat)
+        ps.write_time_constraint()
+        ps.write_extend_final_pos_to_end_time()
+        try:
+            result = ps.check()
+            if result == unsat:
+                return False
+            return (ps.model()[ps.x], ps.model()[ps.y], ps.model()[ps.t])
+        except Exception as e:
+            print(f'Error during solving: {e}')
+            return False
+
 class TestUtil():
     def __init__(self):
         pass
