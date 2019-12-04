@@ -261,26 +261,44 @@ class ProgSolver():
         '''
         num_dicts = len(dicts)
         if p_idx == 1:
-            self.s.assert_and_track(And(self.n1 >= 0, self.n1 <= num_dicts,\
+            self.s.assert_and_track(And(self.n1 >= 0, self.n1 <= num_dicts),\
                                     f'N1 BOUND')
         else:
-            self.s.assert_and_track(And(self.n2 >= 0, self.n2 <= num_dicts,\
+            self.s.assert_and_track(And(self.n2 >= 0, self.n2 <= num_dicts),\
                                     f'N2 BOUND')
 
     def write_all_index_positions(self, dicts, p_idx):
-        num_dicts = len(dicts)
+        # TODO: handle sleep, travel
+        bins = LangUtil.bin_stat_dicts_by_r(dicts)
+        r1_dicts = bins[0]
+        r2_dicts = bins[1]
+        # r1_dicts.insert(LangUtil.parse_move_to(\
+        #         f'moveTo({self.R1_INIT_X}, {self.R1_INIT_Y}, 0, 1)'))
+        # r2_dicts.insert(LangUtil.parse_move_to(\
+        #         f'moveTo({self.R2_INIT_X}, {self.R2_INIT_Y}, 0, 2)'))
+        dicts_ser = r1_dicts + r2_dicts
+        curr_n = 0
+        p1x = self.p1x
+        p1y = self.p1y
+        p2x = self.p2x
+        p2y = self.p2y
+        n1 = self.n1
+        n2 = self.n2
         if p_idx == 1:
-            # TODO: assertions from initial position,
-            # but how do we know R1, R2? Uh oh
-            # need to bin by robot first before we draw segments
-            # then we can access the inital positions :)
-            for i in range(0, num_dicts):
-                prev_x = dicts[i - 1]['x']
-                prev_y = dicts[i - 1]['y']
-                curr_x = dicts[i]['x']
-                curr_y = dicts[i]['y']
-                # self.s.assert_and_track(
-                # TODO: finish when not hungry
+            for i in range(0, len(dicts_ser)):
+                # Will probably need to look backwards for travels, but not now
+                # prev_x = dicts_ser[i - 1]['x']
+                # prev_y = dicts_ser[i - 1]['y']
+                curr_x = dicts_ser[i]['x']
+                curr_y = dicts_ser[i]['y']
+                self.s.add(Implies(n1 == curr_n, p1x(n1) == curr_x))
+                self.s.add(Implies(n1 == curr_n, p1y(n1) == curr_y))
+        else:
+            for i in range(0, len(dicts_ser)):
+                curr_x = dicts_ser[i]['x']
+                curr_y = dicts_ser[i]['y']
+                self.s.add(Implies(n2 == curr_n, p2x(n2) == curr_x))
+                self.s.add(Implies(n2 == curr_n, p2y(n2) == curr_y))
 
     def write_equiv_constraint(self):
         n1 = self.n1
@@ -356,23 +374,24 @@ class Analyzer():
             print(f'Error during solving: {e}')
             return False
 
-        # TODO: handle splitting and merging segments
-        @staticmethod
-        def check_equivalent(prog_target, prog_rewrite):
-            prog_texts = (prog_target, prog_rewrite)
-            ps = ProgSolver()
-            for p in range(0, 2):
-                stats = LangUtil.prog_text_to_statements(prog_texts[p])
-                dicts = LangUtil.stat_to_arg_dict(stats)
-                ps.write_indices_constraints(dicts, p)
-                ps.write_all_index_positions(dicts, p)
-            ps.write_equiv_constraint()
-            try:
-                result = ps.check()
-                return result != unsat
-            except Exception as e:
-                print(f'Error during solving: {e}')
-                return False
+    # TODO: handle splitting and merging segments
+    def check_equivalent(self, prog_target, prog_rewrite):
+        prog_texts = (prog_target, prog_rewrite)
+        ps = ProgSolver()
+        for p in range(0, 2):
+            stats = LangUtil.prog_text_to_statements(prog_texts[p])
+            print(stats)
+            dicts = LangUtil.statements_to_dicts(stats)
+            ps.write_indices_constraints(dicts, p)
+            ps.write_all_index_positions(dicts, p)
+        ps.write_equiv_constraint()
+        print(ps.assertions)
+        try:
+            result = ps.check()
+            return result != unsat
+        except Exception as e:
+            print(f'Error during solving: {e}')
+            return False
 
 class TestUtil():
     def __init__(self):
