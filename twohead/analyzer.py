@@ -340,9 +340,17 @@ class TestUtil():
         ps.write_pos_initial()
         ps.write_arm_constraints()
         for stat in dicts:
-            ps.write_pos_move_to(stat)
+            if stat['instr'] == 'moveTo':
+                ps.write_pos_move_to(stat)
+            elif stat['instr'] == 'sleep':
+                ps.write_sleep(stat)
         ps.write_time_constraint()
         ps.write_extend_final_pos_to_end_time()
+        # test_time = sqrt(150**2 + 150**2)
+        # ps.s.add(Real('r1xTEST') == ps.r1x(test_time))
+        # ps.s.add(Real('r1yTEST') == ps.r1y(test_time))
+        # ps.s.add(Real('r2xTEST') == ps.r2x(test_time))
+        # ps.s.add(Real('r2yTEST') == ps.r2y(test_time))
         try:
             # print(ps.assertions)
             result = ps.check()
