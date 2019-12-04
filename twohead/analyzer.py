@@ -266,6 +266,22 @@ class ProgSolver():
         else:
             self.s.assert_and_track(And(self.n2 >= 0, self.n2 <= num_dicts,\
                                     f'N2 BOUND')
+
+    def write_all_index_positions(self, dicts, p_idx):
+        num_dicts = len(dicts)
+        if p_idx == 1:
+            # TODO: assertions from initial position,
+            # but how do we know R1, R2? Uh oh
+            # need to bin by robot first before we draw segments
+            # then we can access the inital positions :)
+            for i in range(0, num_dicts):
+                prev_x = dicts[i - 1]['x']
+                prev_y = dicts[i - 1]['y']
+                curr_x = dicts[i]['x']
+                curr_y = dicts[i]['y']
+                # self.s.assert_and_track(
+                # TODO: finish when not hungry
+
     def write_equiv_constraint(self):
         n1 = self.n1
         n2 = self.n2
