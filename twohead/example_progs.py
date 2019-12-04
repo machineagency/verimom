@@ -42,7 +42,13 @@ moveTo(150, 200, 0, 1);
 prog_safe_easy_optimize = """moveTo(0, 20, 0, 1);
 moveTo(0, 100, 0, 1);
 travel(300, 20, 0, 1);
-moveTo(20, 100, 0, 1);
+moveTo(300, 100, 0, 1);
 sleep(300, 2);
+"""
+
+prog_safe_easy_post_opt = """moveTo(0, 20, 0, 1);
+moveTo(0, 100, 0, 1);
+moveTo(300, 20, 0, 2);
+moveTo(300, 100, 0, 2);
 """
 

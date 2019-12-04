@@ -273,6 +273,7 @@ class Analyzer():
         self.init_pos_r1 = init_pos_r1
         self.init_pos_r2 = init_pos_r2
 
+    # TODO: interactively block out collision points to check num of collisions
     @staticmethod
     def check_collision(prog):
         """
