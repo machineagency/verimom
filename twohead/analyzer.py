@@ -72,6 +72,7 @@ class ProgSolver():
         """
         self.s = z3.Solver()
         self.s.set(':core.minimize', True)
+        # Fields for collision solving
         self.ROBOT_ARM_WIDTH = 5
         self.X_LIM = 300
         self.Y_LIM = 300
@@ -91,7 +92,15 @@ class ProgSolver():
         self.r2x = Function('r2x', RealSort(), RealSort())
         self.r2y = Function('r2y', RealSort(), RealSort())
         self.t = Real('t')
+        # Fields for equivalence solving
+        self.n1 = Int('n1')
+        self.n2 = Int('n2')
+        self.p1x = Function('p1x', IntSort(), RealSort())
+        self.p1y = Function('p1y', IntSort(), RealSort())
+        self.p2x = Function('p2x', IntSort(), RealSort())
+        self.p2y = Function('p2y', IntSort(), RealSort())
 
+    # Constraints for collision problem
     def set_work_envelope_setting(self, tup):
         self.X_LIM = tup[0]
         self.Y_LIM = tup[1]
@@ -311,9 +320,9 @@ class Analyzer():
             for p in range(0, 2):
                 stats = LangUtil.prog_text_to_statements(prog_texts[p])
                 dicts = LangUtil.stat_to_arg_dict(stats)
-                ps.write_indices_constraints()
-                ps.write_all_index_positions(dicts)
-                ps.write_equiv_constraint()
+                ps.write_indices_constraints(dicts, p)
+                ps.write_all_index_positions(dicts, p)
+            ps.write_equiv_constraint()
             try:
                 result = ps.check()
                 return result != unsat
