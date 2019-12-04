@@ -54,26 +54,40 @@ class LangUtil():
 
     @staticmethod
     def stat_to_arg_dict(statement):
-        instr = LangUtil.peek_instr(statement)
+        instr = LangUtil.peek_instr_text(statement)
         if instr == 'moveTo':
             return LangUtil.parse_move_to(statement)
+        if instr == 'sleep':
+            return LangUtil.parse_sleep(statement)
         else:
             print(f'Unrecognized instruction: {instr}')
             return {}
 
     @staticmethod
-    def peek_instr(statement):
+    def peek_instr_text(statement):
         return statement.split('(')[0]
 
     @staticmethod
     def parse_move_to(statement):
         arg_lst = statement.replace('(', ',')\
                            .replace(')', ',')\
-                           .split(',')[1:5]
-        return { 'x': int(arg_lst[0]),\
-                 'y': int(arg_lst[1]),\
-                 'z': int(arg_lst[2]),\
-                 'r': int(arg_lst[3]),\
+                           .split(',')[0:5]
+        return { 'instr': arg_lst[0],\
+                 'x': int(arg_lst[1]),\
+                 'y': int(arg_lst[2]),\
+                 'z': int(arg_lst[3]),\
+                 'r': int(arg_lst[4]),\
+                 'statement': statement\
+        }
+
+    @staticmethod
+    def parse_sleep(statement):
+        arg_lst = statement.replace('(', ',')\
+                           .replace(')', ',')\
+                           .split(',')[0:3]
+        return { 'instr': arg_lst[0],\
+                 's': int(arg_lst[1]),\
+                 'r': int(arg_lst[2]),\
                  'statement': statement\
         }
 
