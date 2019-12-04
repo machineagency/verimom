@@ -266,6 +266,21 @@ class ProgSolver():
         else:
             self.s.assert_and_track(And(self.n2 >= 0, self.n2 <= num_dicts,\
                                     f'N2 BOUND')
+    def write_equiv_constraint(self):
+        n1 = self.n1
+        n2 = self.n2
+        p1x = self.p1x
+        p1y = self.p1y
+        p2x = self.p2x
+        p2y = self.p2y
+        self.s.assert_and_track(ForAll([n1], Exists(n2,\
+                And(p1x(n1) == p2x(n2), p1y(n1) == p2y(n2)))),\
+                f'EQUIV CONSTRAINT N1')
+        self.s.assert_and_track(ForAll([n2], Exists(n1,\
+                And(p2x(n2) == p1x(n1), p2y(n2) == p1y(n1)))),\
+                f'EQUIV CONSTRAINT N2')
+
+    # Getters and miscellaneous
     @property
     def assertions(self):
         return [a for a in self.s.assertions()]
