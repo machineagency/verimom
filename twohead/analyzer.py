@@ -15,7 +15,7 @@ class LangUtil():
     @staticmethod
     def stat_to_arg_dict(statement):
         instr = LangUtil.peek_instr_text(statement)
-        if instr == 'moveTo':
+        if instr == 'moveTo' or instr == 'travel':
             return LangUtil.parse_move_to(statement)
         if instr == 'sleep':
             return LangUtil.parse_sleep(statement)
@@ -174,12 +174,12 @@ class ProgSolver():
             Implies(And(t > t_old, t <= t_new),\
                 x(t) == (1 - (t - t_old) / time_taken) * x_old\
                     + ((t - t_old) / time_taken) * x_new)),\
-                f'POS_X: R{stat_dict["r"]} {x_old} -> {x_new}')
+                f'POS_X: R{stat_dict["r"]} {x_old} -> {x_new} @ t={t_old}')
         self.s.assert_and_track(ForAll([t],\
             Implies(And(t > t_old, t <= t_new),\
                 y(t) == (1 - (t - t_old) / time_taken) * y_old\
                     + ((t - t_old) / time_taken) * y_new)),\
-                f'POS_Y: R{stat_dict["r"]} {y_old} -> {y_new}')
+                f'POS_Y: R{stat_dict["r"]} {y_old} -> {y_new} @ t={t_old}')
 
         # Update (x, y, t)
         if stat_dict['r'] == 1:
@@ -288,7 +288,7 @@ class Analyzer():
         ps.write_pos_initial()
         ps.write_arm_constraints()
         for stat in dicts:
-            if stat['instr'] == 'moveTo':
+            if stat['instr'] == 'moveTo' or stat['instr'] == 'travel':
                 ps.write_pos_move_to(stat)
             elif stat['instr'] == 'sleep':
                 ps.write_sleep(stat)
@@ -393,4 +393,6 @@ if __name__ == '__main__':
     print(TestUtil.run_on_prog(prog_safe_sleep_before_collide))
     print("Running on unsafe program with sleep.")
     print(TestUtil.run_on_prog(prog_unsafe_not_enough_sleep_before_collide))
+    print("Running on safe but slow prog.")
+    print(TestUtil.run_on_prog(prog_safe_easy_optimize))
 
