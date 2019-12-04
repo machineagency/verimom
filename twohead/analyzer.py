@@ -254,6 +254,18 @@ class ProgSolver():
             self.s.assert_and_track(ForAll([t], Implies(t > self._clock_r2,\
                     r2y(t) == self._curr_r2y)), 'R2Y EXTEND')
 
+    # Constraints for equivalence problem
+    def write_indices_constraints(self, dicts, p_idx):
+        '''
+        NB: we add initial positions later, so upper bound is |dicts|.
+        '''
+        num_dicts = len(dicts)
+        if p_idx == 1:
+            self.s.assert_and_track(And(self.n1 >= 0, self.n1 <= num_dicts,\
+                                    f'N1 BOUND')
+        else:
+            self.s.assert_and_track(And(self.n2 >= 0, self.n2 <= num_dicts,\
+                                    f'N2 BOUND')
     @property
     def assertions(self):
         return [a for a in self.s.assertions()]
@@ -313,6 +325,7 @@ class Analyzer():
             print(f'Error during solving: {e}')
             return False
 
+        # TODO: handle splitting and merging segments
         @staticmethod
         def check_equivalent(prog_target, prog_rewrite):
             prog_texts = (prog_target, prog_rewrite)
