@@ -12,6 +12,9 @@ class Rewriter():
         prog_r_stats = LangUtil.prog_text_to_statements(self.prog_r_text)
         self.prog_t = LangUtil.statements_to_dicts(prog_t_stats)
         self.prog_r = LangUtil.statements_to_dicts(prog_r_stats)
+        self.RANDOM_SEED = 9382107
+        seed(self.RANDOM_SEED)
+        self.analyzer = Analyzer((300, 300), (0, 0), (300, 0))
 
     def change_instr(self):
         pass
