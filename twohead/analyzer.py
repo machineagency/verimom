@@ -413,6 +413,8 @@ class Analyzer():
         self.work_envelope = work_envelope
         self.init_pos_r1 = init_pos_r1
         self.init_pos_r2 = init_pos_r2
+        self.X_LIM = work_envelope[0]
+        self.Y_LIM = work_envelope[1]
 
     # TODO: interactively block out collision points to check num of collisions
     def check_collision(self, prog):
