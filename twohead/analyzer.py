@@ -98,6 +98,11 @@ class LangUtil():
             curr_dict = dicts[i]
             if curr_dict['instr'] == 'moveTo':
                 curr_move_pos = (curr_dict['x'], curr_dict['y'])
+                # NOTE: If we did some travels, check to make sure that the
+                # last travel, i.e. where this moveTo starts from, is at the
+                # same point as the last moveTo point. If not, the last moveTo
+                # point is the end of the last path, and we start a new path
+                # starting with the travel point, and the newest moveTo point.
                 if prev_dict['instr'] == 'travel':
                     last_travel_pt = (prev_dict['x'], prev_dict['y'])
                     if not same_pt(last_move_pos, last_travel_pt):
@@ -426,7 +431,6 @@ class Analyzer():
             print(f'Error during solving: {e}')
             return False
 
-    # TODO: handle splitting and merging segments
     def check_equivalent_nosmt(self, prog_target, prog_rewrite):
         stats_t = LangUtil.prog_text_to_statements(prog_target)
         stats_r = LangUtil.prog_text_to_statements(prog_rewrite)
@@ -438,7 +442,6 @@ class Analyzer():
         pts_r = LangUtil.dicts_to_points(dicts_r)
         return pts_t == pts_r
 
-    # TODO: handle splitting and merging segments
     def check_equivalent(self, prog_target, prog_rewrite):
         prog_texts = (prog_target, prog_rewrite)
         ps = ProgSolver()
