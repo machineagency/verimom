@@ -1,5 +1,6 @@
 from z3 import *
 from math import *
+from functools import reduce
 from example_progs import *
 
 class LangUtil():
@@ -79,29 +80,37 @@ class LangUtil():
                 end_pt = pts[i + 2]
                 m0 = slope(start_pt, maybe_mid_pt)
                 m1 = slope(maybe_mid_pt, end_pt)
-                print(f'SME: {start_pt}, {maybe_mid_pt}, {end_pt}')
-                print(f'Slopes: {m0}, {m1}')
                 if m0 == m1 or same_pt(start_pt, maybe_mid_pt):
                     mp_indices.append(i + 1)
-                    print(f'Append: {i + 1}')
                 i += 1
             new_pts = []
             while i <= len(pts) - 1:
                 if i not in mp_indices:
                     new_pts.append(pts[i])
                 i += 1
-            print(f'C: {new_pts}')
             return new_pts
 
-        pts = []
+        paths = []
+        curr_path = []
+        last_move_pos = (dicts[0]['x'], dicts[0]['y'])
         for i in range(0, len(dicts)):
             prev_dict = dicts[i - 1] if i > 0 else { 'instr': 'noop' }
             curr_dict = dicts[i]
             if curr_dict['instr'] == 'moveTo':
+                curr_move_pos = (curr_dict['x'], curr_dict['y'])
                 if prev_dict['instr'] == 'travel':
-                    pts.append((prev_dict['x'], prev_dict['y']))
-                pts.append((curr_dict['x'], curr_dict['y']))
-        pts = merge_points(pts)
+                    last_travel_pt = (prev_dict['x'], prev_dict['y'])
+                    if not same_pt(last_move_pos, last_travel_pt):
+                        paths.append(curr_path)
+                        curr_path = [last_travel_pt, curr_move_pos]
+                    else:
+                        curr_path.append(curr_move_pos)
+                else:
+                    curr_path.append(curr_move_pos)
+                last_move_pos = curr_move_pos
+        paths.append(curr_path)
+        paths = map(merge_points, paths)
+        pts = reduce(lambda path0, path1: path0 + path1, paths)
         return sorted(pts, key=lambda xy: [xy[0], xy[1]])
 
 class ProgSolver():
@@ -425,12 +434,8 @@ class Analyzer():
         dicts_r = LangUtil.statements_to_dicts(stats_r)
         # bins_t = LangUtil.bin_stat_dicts_by_r(dicts_t)
         # bins_r = LangUtil.bin_stat_dicts_by_r(dicts_r)
-        print('Op on T')
         pts_t = LangUtil.dicts_to_points(dicts_t)
-        print('Op on R')
         pts_r = LangUtil.dicts_to_points(dicts_r)
-        print(f'T:{pts_t}')
-        print(f'R:{pts_r}')
         return pts_t == pts_r
 
     # TODO: handle splitting and merging segments
