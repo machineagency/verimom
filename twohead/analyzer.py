@@ -57,6 +57,11 @@ class LangUtil():
         return list(map(LangUtil.stat_to_arg_dict, statements))
 
     @staticmethod
+    def dicts_to_text(dicts):
+        stats = [d['statement'] for d in dicts]
+        return reduce(lambda s0, s1: s0 + ';\n' + s1, stats)
+
+    @staticmethod
     def bin_stat_dicts_by_r(dicts):
         return [list(filter(lambda d: d['r'] == 1, dicts)),\
                 list(filter(lambda d: d['r'] == 2, dicts))]
