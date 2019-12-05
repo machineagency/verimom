@@ -28,11 +28,12 @@ class Rewriter():
     def random_walk(self, steps):
         pass
 
-    def get_prog_r_text(self):
+    @property
+    def curr_rewrite(self):
         return LangUtil.dicts_to_text(self.prog_r)
 
 if __name__ == '__main__':
     rw = Rewriter(prog_safe_r1_set)
     rw.random_walk(3)
-    print(rw.get_prog_r_text())
+    print(rw.curr_rewrite)
 
