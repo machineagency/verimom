@@ -74,7 +74,26 @@ class Rewriter():
             self.change_line(line_num)
 
     def random_walk(self, steps):
-        pass
+        NUM_PERMUTATIONS = 5
+        for _ in range(0, steps):
+            permutation_choice = randint(0, NUM_PERMUTATIONS)
+            line_num = self.get_random_line_num()
+            print(f'Line num: {line_num}')
+            print(f'P: {permutation_choice}')
+            if permutation_choice == 0:
+                self.change_instr(line_num)
+            if permutation_choice == 1:
+                self.change_operand(line_num)
+            if permutation_choice == 2:
+                self.swap_instr(line_num)
+            if permutation_choice == 3:
+                self.change_line(line_num)
+            if permutation_choice == 4:
+                self.add_or_delete_line(line_num)
+            # print(self.curr_rewrite)
+
+    def get_random_line_num(self):
+        return randint(0, len(self.prog_r) - 1)
 
     @property
     def curr_rewrite(self):
@@ -82,6 +101,6 @@ class Rewriter():
 
 if __name__ == '__main__':
     rw = Rewriter(prog_safe_r1_set)
-    rw.random_walk(3)
+    rw.random_walk(100)
     print(rw.curr_rewrite)
 
