@@ -67,32 +67,31 @@ class LangUtil():
             if denom == 0:
                 return inf
             return (pt1[1] - pt0[1]) / denom
+        def same_pt(pt0, pt1):
+            return pt0[0] == pt1[0] and pt0[1] == pt1[1]
         def merge_points(pts):
             # TODO: split between arms?
-            curr_pts = pts.copy()
-            merges_made = 1
-            while merges_made > 0:
-                new_pts = []
-                merges_made = 0
-                i = 0
-                while i < len(curr_pts) - 3:
-                    start_pt = pts[i]
-                    maybe_mid_pt = pts[i + 1]
-                    end_pt = pts[i + 2]
-                    m0 = slope(start_pt, maybe_mid_pt)
-                    m1 = slope(maybe_mid_pt, end_pt)
-                    if m0 != m1:
-                        new_pts.append(start_pt)
-                        i += 1
-                    else:
-                        print(f'Merge out: {maybe_mid_pt}')
-                        merges_made += 1
-                        new_pts.append(start_pt)
-                        i += 2
-                new_pts = new_pts + curr_pts[(len(curr_pts) - 2):]
-                curr_pts = new_pts.copy()
-                print(f'C:{curr_pts}')
-            return curr_pts
+            mp_indices = []
+            i = 0
+            while i <= len(pts) - 3:
+                start_pt = pts[i]
+                maybe_mid_pt = pts[i + 1]
+                end_pt = pts[i + 2]
+                m0 = slope(start_pt, maybe_mid_pt)
+                m1 = slope(maybe_mid_pt, end_pt)
+                print(f'SME: {start_pt}, {maybe_mid_pt}, {end_pt}')
+                print(f'Slopes: {m0}, {m1}')
+                if m0 == m1 or same_pt(start_pt, maybe_mid_pt):
+                    mp_indices.append(i + 1)
+                    print(f'Append: {i + 1}')
+                i += 1
+            new_pts = []
+            while i <= len(pts) - 1:
+                if i not in mp_indices:
+                    new_pts.append(pts[i])
+                i += 1
+            print(f'C: {new_pts}')
+            return new_pts
 
         pts = []
         for i in range(0, len(dicts)):
