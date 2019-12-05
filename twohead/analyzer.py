@@ -57,6 +57,14 @@ class LangUtil():
         return list(map(LangUtil.stat_to_arg_dict, statements))
 
     @staticmethod
+    def update_dict_statement(d):
+        if d['instr'] == 'moveTo' or d['instr'] == 'travel':
+            d['statement'] = f'{d["instr"]}({d["x"]}, {d["y"]}, 0, {d["r"]})'
+        if d['instr'] == 'sleep':
+            d['statement'] = f'{d["instr"]}({d["s"]}, {d["r"]})'
+        return d
+
+    @staticmethod
     def dicts_to_text(dicts):
         stats = [d['statement'] for d in dicts]
         return reduce(lambda s0, s1: s0 + ';\n' + s1, stats)
