@@ -16,8 +16,13 @@ class Rewriter():
         seed(self.RANDOM_SEED)
         self.analyzer = Analyzer((300, 300), (0, 0), (300, 0))
 
-    def change_instr(self):
-        pass
+    def change_instr(self, line_num):
+        d = self.prog_r[line_num]
+        if d['instr'] == 'moveTo':
+            d['instr'] = 'travel'
+        elif d['instr'] == 'travel':
+            d['instr'] = 'moveTo'
+        d = LangUtil.update_dict_statement(d)
 
     def change_operand(self):
         pass
