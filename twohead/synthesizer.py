@@ -24,14 +24,54 @@ class Rewriter():
             d['instr'] = 'moveTo'
         d = LangUtil.update_dict_statement(d)
 
-    def change_operand(self):
-        pass
+    def change_operand(self, line_num):
+        d = self.prog_r[line_num]
+        if d['instr'] == 'moveTo' or d['instr'] == 'travel':
+            op_num = randint(0, 2)
+            if op_num == 0:
+                d['x'] = randint(0, self.analyzer.X_LIM)
+            if op_num == 1:
+                d['y'] = randint(0, self.analyzer.Y_LIM)
+            if op_num == 2:
+                d['r'] = randint(1, 3)
+        if d['instr'] == 'sleep':
+            op_num = randint(0, 1)
+            if op_num == 0:
+                # TODO: either use canned immediates or constraint s operand
+                # to total time taken
+                d['s'] = randint(0, 10)
+            if op_num == 1:
+                d['r'] = randint(1, 2)
+        d = LangUtil.update_dict_statement(d)
 
-    def swap_instr(self):
-        pass
+    def swap_instr(self, line_num):
+        other_line_num = self.get_random_line_num()
+        d0 = self.prog_r[line_num]
+        d1 = self.prog_r[other_line_num]
+        self.prog_r[line_num], self.prog_r[other_line_num] = d1, d0
 
-    def change_line(self):
-        pass
+    def change_line(self, line_num):
+        d = self.prog_r[line_num]
+        instrs = ['moveTo', 'travel', 'sleep']
+        d['instr'] = instrs[randint(0, 2)]
+        if d['instr'] == 'moveTo' or d['instr'] == 'travel':
+            d['x'] = randint(0, self.analyzer.X_LIM)
+            d['y'] = randint(0, self.analyzer.Y_LIM)
+            d['r'] = randint(1, 3)
+        if d['instr'] == 'sleep':
+            # TODO: either use canned immediates or constraint s operand
+            # to total time taken
+            d['s'] = randint(0, 10)
+            d['r'] = randint(1, 2)
+        d = LangUtil.update_dict_statement(d)
+
+    def add_or_delete_line(self, line_num):
+        add_or_delete = randint(0, 3)
+        if add_or_delete == 0:
+            del self.prog_r[line_num]
+        else:
+            self.prog_r.insert(line_num, { 'instr' : 'noop' })
+            self.change_line(line_num)
 
     def random_walk(self, steps):
         pass
