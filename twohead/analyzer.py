@@ -62,12 +62,47 @@ class LangUtil():
 
     @staticmethod
     def dicts_to_points(dicts):
-        # TODO: handle sleep, travel, merging
+        def slope(pt0, pt1):
+            denom = (pt1[0] - pt0[0])
+            if denom == 0:
+                return inf
+            return (pt1[1] - pt0[1]) / denom
+        def merge_points(pts):
+            # TODO: split between arms?
+            curr_pts = pts.copy()
+            merges_made = 1
+            while merges_made > 0:
+                new_pts = []
+                merges_made = 0
+                i = 0
+                while i < len(curr_pts) - 3:
+                    start_pt = pts[i]
+                    maybe_mid_pt = pts[i + 1]
+                    end_pt = pts[i + 2]
+                    m0 = slope(start_pt, maybe_mid_pt)
+                    m1 = slope(maybe_mid_pt, end_pt)
+                    if m0 != m1:
+                        new_pts.append(start_pt)
+                        i += 1
+                    else:
+                        print(f'Merge out: {maybe_mid_pt}')
+                        merges_made += 1
+                        new_pts.append(start_pt)
+                        i += 2
+                new_pts = new_pts + curr_pts[(len(curr_pts) - 2):]
+                curr_pts = new_pts.copy()
+                print(f'C:{curr_pts}')
+            return curr_pts
+
         pts = []
         for i in range(0, len(dicts)):
+            prev_dict = dicts[i - 1] if i > 0 else { 'instr': 'noop' }
             curr_dict = dicts[i]
             if curr_dict['instr'] == 'moveTo':
+                if prev_dict['instr'] == 'travel':
+                    pts.append((prev_dict['x'], prev_dict['y']))
                 pts.append((curr_dict['x'], curr_dict['y']))
+        pts = merge_points(pts)
         return sorted(pts, key=lambda xy: [xy[0], xy[1]])
 
 class ProgSolver():
@@ -391,8 +426,12 @@ class Analyzer():
         dicts_r = LangUtil.statements_to_dicts(stats_r)
         # bins_t = LangUtil.bin_stat_dicts_by_r(dicts_t)
         # bins_r = LangUtil.bin_stat_dicts_by_r(dicts_r)
+        print('Op on T')
         pts_t = LangUtil.dicts_to_points(dicts_t)
+        print('Op on R')
         pts_r = LangUtil.dicts_to_points(dicts_r)
+        print(f'T:{pts_t}')
+        print(f'R:{pts_r}')
         return pts_t == pts_r
 
     # TODO: handle splitting and merging segments
