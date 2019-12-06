@@ -457,11 +457,23 @@ class Analyzer():
         stats_r = LangUtil.prog_text_to_statements(prog_rewrite)
         dicts_t = LangUtil.statements_to_dicts(stats_t)
         dicts_r = LangUtil.statements_to_dicts(stats_r)
-        # bins_t = LangUtil.bin_stat_dicts_by_r(dicts_t)
-        # bins_r = LangUtil.bin_stat_dicts_by_r(dicts_r)
         pts_t = LangUtil.dicts_to_points(dicts_t)
         pts_r = LangUtil.dicts_to_points(dicts_r)
-        return pts_t == pts_r
+        score = 0
+        if pts_t != pts_r:
+            if len(pts_t) > len(pts_r):
+                last_pt = pts_r[len(pts_r) - 1]
+                len_diff = len(pts_t) - len(pts_r)
+                pts_r += [last_pt for _ in range(0, len_diff + 1)]
+            elif len(pts_t) < len(pts_r):
+                last_pt = pts_t[len(pts_t) - 1]
+                len_diff = len(pts_r) - len(pts_t)
+                pts_t += [last_pt for _ in range(0, len_diff + 1)]
+            pt_pairs = list(zip(pts_t, pts_r))
+            distances = list(map(lambda pt_pair: self.dist(pt_pair[0],\
+                                    pt_pair[1]), pt_pairs))
+            score = reduce(lambda a, b: a + b, distances)
+        return score
 
     def check_equivalent(self, prog_target, prog_rewrite):
         prog_texts = (prog_target, prog_rewrite)
@@ -482,9 +494,6 @@ class Analyzer():
             return False
 
     def find_running_time(self, prog):
-        def dist(p0, p1):
-            return sqrt((p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2)
-
         stats = LangUtil.prog_text_to_statements(prog)
         dicts = LangUtil.statements_to_dicts(stats)
         r1_stats, r2_stats = LangUtil.bin_stat_dicts_by_r(dicts)
@@ -499,12 +508,15 @@ class Analyzer():
         for i in range(0, len(r1_stats) - 1):
             p0 = (r1_stats[i]['x'], r1_stats[i]['y'])
             p1 = (r1_stats[i + 1]['x'], r1_stats[i + 1]['y'])
-            r1_time += dist(p0, p1)
+            r1_time += self.dist(p0, p1)
         for i in range(0, len(r2_stats) - 1):
             p0 = (r2_stats[i]['x'], r2_stats[i]['y'])
             p1 = (r2_stats[i + 1]['x'], r2_stats[i + 1]['y'])
-            r2_time += dist(p0, p1)
+            r2_time += self.dist(p0, p1)
         return max(r1_time, r2_time)
+
+    def dist(self, p0, p1):
+        return sqrt((p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2)
 
 class TestUtil():
     def __init__(self):
