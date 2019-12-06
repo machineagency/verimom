@@ -144,6 +144,7 @@ class ProgSolver():
         self.s = z3.Solver()
         self.s.set(':core.minimize', True)
         # Fields for collision solving
+        self.MAX_COLLISIONS = 10
         self.ROBOT_ARM_WIDTH = 5
         self.X_LIM = 300
         self.Y_LIM = 300
@@ -437,14 +438,19 @@ class Analyzer():
                 ps.write_sleep(stat)
         ps.write_time_constraint()
         ps.write_extend_final_pos_to_end_time()
-        try:
-            result = ps.check()
-            if result == unsat:
+        collisions = 0
+        for _ in range(0, ps.MAX_COLLISIONS):
+            try:
+                result = ps.check()
+                if result == unsat:
+                    return collisions
+                collisions += 1
+                ps.s.add(Or(ps.t <= ps.model()[ps.t] - ps.ROBOT_ARM_WIDTH,\
+                            ps.t >= ps.model()[ps.t] + ps.ROBOT_ARM_WIDTH))
+            except Exception as e:
+                print(f'Error during solving: {e}')
                 return False
-            return (ps.model()[ps.x], ps.model()[ps.y], ps.model()[ps.t])
-        except Exception as e:
-            print(f'Error during solving: {e}')
-            return False
+        return collisions
 
     def check_equivalent_nosmt(self, prog_target, prog_rewrite):
         stats_t = LangUtil.prog_text_to_statements(prog_target)
@@ -579,13 +585,20 @@ class TestUtil():
         # return analyzer.check_equivalent(prog_t, prog_t)
         return analyzer.check_equivalent_nosmt(prog_t, prog_r)
 
+    @staticmethod
+    def count_collisions(prog):
+        analyzer = Analyzer((300, 300), (0, 0), (300, 0))
+        return analyzer.check_collision(prog)
+
 if __name__ == '__main__':
     # print("Testing binning on unsafe program.")
     # print(TestUtil.bin_test(prog_unsafe_r1_collide))
     # print("Running on safe program.")
     # print(TestUtil.run_on_prog(prog_safe_r1_set))
-    # print("Running on unsafe program.")
-    # print(TestUtil.run_on_prog(prog_unsafe_r1_collide))
+    print("Running on unsafe program.")
+    print(TestUtil.run_on_prog(prog_unsafe_r1_collide))
+    print("Running on unsafe program using check_collision.")
+    print(TestUtil.count_collisions(prog_unsafe_r1_collide))
     # print("Running on longer safe program.")
     # print(TestUtil.run_on_prog(prog_safe_longer))
     # print("Running on longer unsafe program.")
@@ -598,10 +611,16 @@ if __name__ == '__main__':
     # print(TestUtil.run_on_prog(prog_unsafe_not_enough_sleep_before_collide))
     # print("Running on safe but slow prog.")
     # print(TestUtil.run_on_prog(prog_safe_easy_optimize))
-    print("Testing equivalence with safe prog on itself.")
-    print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_r1_set))
-    print("Testing equivalence with safe prog on reverse version")
-    print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_r1_set_rev))
-    print("Testing equivalence with safe prog and non-equiv unsafe")
-    print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_longer))
+    # print("Testing equivalence with safe prog on itself.")
+    # print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_r1_set))
+    # print("Testing equivalence with safe prog on reverse version")
+    # print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_r1_set_rev))
+    # print("Testing equivalence with safe prog and non-equiv unsafe")
+    # print(TestUtil.test_equiv(prog_safe_r1_set, prog_safe_longer))
+    # print("Testing equivalence with easy to optimize prog with optimized")
+    # print(TestUtil.test_equiv(prog_safe_easy_optimize, prog_safe_easy_post_opt))
+    # print("Testing equivalence with segmented vs. merged")
+    # print(TestUtil.test_equiv(prog_segmented, prog_merged))
+    # print("Testing equivalence with wrong segmented vs. merged")
+    # print(TestUtil.test_equiv(prog_segmented_wrong, prog_merged))
 
