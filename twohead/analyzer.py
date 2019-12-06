@@ -475,6 +475,31 @@ class Analyzer():
             print(f'Error during solving: {e}')
             return False
 
+    def find_running_time(self, prog):
+        def dist(p0, p1):
+            return sqrt((p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2)
+
+        stats = LangUtil.prog_text_to_statements(prog)
+        dicts = LangUtil.statements_to_dicts(stats)
+        r1_stats, r2_stats = LangUtil.bin_stat_dicts_by_r(dicts)
+        r1_stats = list(filter(lambda d: d['instr'] == 'moveTo'
+                            or d['instr'] == 'travel', r1_stats))
+        r2_stats = list(filter(lambda d: d['instr'] == 'moveTo'
+                            or d['instr'] == 'travel', r2_stats))
+        r1_time = dist(self.init_pos_r1, (r1_stats[0]['x'], r1_stats[0]['y']))\
+                    if len(r1_stats) > 0 else 0
+        r2_time = dist(self.init_pos_r2, (r2_stats[0]['x'], r2_stats[0]['y']))\
+                    if len(r2_stats) > 0 else 0
+        for i in range(0, len(r1_stats) - 1):
+            p0 = (r1_stats[i]['x'], r1_stats[i]['y'])
+            p1 = (r1_stats[i + 1]['x'], r1_stats[i + 1]['y'])
+            r1_time += dist(p0, p1)
+        for i in range(0, len(r2_stats) - 1):
+            p0 = (r2_stats[i]['x'], r2_stats[i]['y'])
+            p1 = (r2_stats[i + 1]['x'], r2_stats[i + 1]['y'])
+            r2_time += dist(p0, p1)
+        return max(r1_time, r2_time)
+
 class TestUtil():
     def __init__(self):
         pass
