@@ -222,11 +222,11 @@ class ProgSolver():
         w = self.ROBOT_ARM_WIDTH
         self.s.assert_and_track(And(\
             And(r2x(t) <= r1x(t),\
-                r2y(t) >= r1y(t) - w / 2,\
-                r2y(t) <= r1y(t) + w / 2),
+                r2y(t) >= r1y(t) - w,\
+                r2y(t) <= r1y(t) + w),
             And(r1x(t) >= r2x(t),\
-                r1y(t) >= r2y(t) - w / 2,\
-                r1y(t) <= r2y(t) + w / 2)),\
+                r1y(t) >= r2y(t) - w,\
+                r1y(t) <= r2y(t) + w)),\
             f'ARM')
 
     def write_pos_move_to(self, stat_dict):
