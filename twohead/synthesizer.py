@@ -16,6 +16,8 @@ class Rewriter():
         self.prog_r = LangUtil.statements_to_dicts(prog_r_stats)
         self.prog_rp = LangUtil.statements_to_dicts(prog_rp_stats)
         self.RANDOM_SEED = 4373172
+        self.COLLISION_PENALTY = 100
+        self.BETA = 2
         seed(self.RANDOM_SEED)
         self.analyzer = Analyzer((300, 300), (0, 0), (300, 0))
 
@@ -77,16 +79,25 @@ class Rewriter():
             self.change_line(line_num)
 
     def accept(self, prog_t, prog_r, prog_rp):
-        pass
+        numer = self.cost(prog_t, prog_rp)
+        denom = self.cost(prog_t, prog_r)
+        power = -self.BETA * (numer / denom)
+        return min(1, e ** power)
 
     def cost(self, prog_t, prog_r):
-        pass
+        return self.eq(prog_t, prog_r) + self.perf(prog_t, prog_r)
 
     def eq(self, prog_t, prog_r):
-        pass
+        return self.analyzer.check_equivalent_nosmt(prog_t, prog_r)
 
     def perf(self, prog_t, prog_r):
-        pass
+        running_time_diff = self.analyzer.find_running_time(prog_r)\
+                            - self.analyzer.find_running_time(prog_t)
+        collision_penalty = self.collisions(prog_r) * self.COLLISION_PENALTY
+        return running_time_diff + collision_penalty
+
+    def collisions(self, prog):
+        return self.analyzer.check_collision(prog)
 
     def random_walk(self, steps):
         NUM_PERMUTATIONS = 5
