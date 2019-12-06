@@ -105,7 +105,11 @@ class LangUtil():
 
         paths = []
         curr_path = []
-        last_move_pos = (dicts[0]['x'], dicts[0]['y'])
+        if dicts[0]['instr'] == 'sleep':
+            # TODO: does this matter?
+            last_move_pos = (0, 0)
+        else:
+            last_move_pos = (dicts[0]['x'], dicts[0]['y'])
         for i in range(0, len(dicts)):
             prev_dict = dicts[i - 1] if i > 0 else { 'instr': 'noop' }
             curr_dict = dicts[i]
@@ -460,6 +464,8 @@ class Analyzer():
         pts_t = LangUtil.dicts_to_points(dicts_t)
         pts_r = LangUtil.dicts_to_points(dicts_r)
         score = 0
+        if len(pts_t) == 0 or len(pts_r) == 0:
+            return inf
         if pts_t != pts_r:
             if len(pts_t) > len(pts_r):
                 last_pt = pts_r[len(pts_r) - 1]
@@ -501,9 +507,9 @@ class Analyzer():
                             or d['instr'] == 'travel', r1_stats))
         r2_stats = list(filter(lambda d: d['instr'] == 'moveTo'
                             or d['instr'] == 'travel', r2_stats))
-        r1_time = dist(self.init_pos_r1, (r1_stats[0]['x'], r1_stats[0]['y']))\
+        r1_time = self.dist(self.init_pos_r1, (r1_stats[0]['x'], r1_stats[0]['y']))\
                     if len(r1_stats) > 0 else 0
-        r2_time = dist(self.init_pos_r2, (r2_stats[0]['x'], r2_stats[0]['y']))\
+        r2_time = self.dist(self.init_pos_r2, (r2_stats[0]['x'], r2_stats[0]['y']))\
                     if len(r2_stats) > 0 else 0
         for i in range(0, len(r1_stats) - 1):
             p0 = (r1_stats[i]['x'], r1_stats[i]['y'])
