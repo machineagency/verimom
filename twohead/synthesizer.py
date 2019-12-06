@@ -76,7 +76,16 @@ class Rewriter():
             self.prog_rp.insert(line_num, { 'instr' : 'noop' })
             self.change_line(line_num)
 
-    def decide_accept_rewrite(self, prog_rp):
+    def accept(self, prog_t, prog_r, prog_rp):
+        pass
+
+    def cost(self, prog_t, prog_r):
+        pass
+
+    def eq(self, prog_t, prog_r):
+        pass
+
+    def perf(self, prog_t, prog_r):
         pass
 
     def random_walk(self, steps):
