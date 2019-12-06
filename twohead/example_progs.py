@@ -32,7 +32,7 @@ moveTo(0, 300, 0, 2);
 """
 
 prog_safe_sleep_before_collide = """moveTo(150, 100, 0, 1);
-sleep(8, 2);
+sleep(15, 2);
 moveTo(100, 150, 0, 2);
 moveTo(150, 200, 0, 1);
 """
@@ -79,6 +79,6 @@ moveTo(100, 200, 0, 1);
 moveTo(200, 200, 0, 1);
 moveTo(200, 100, 0, 1);
 moveTo(100, 100, 0, 1);
-sleep(542, r);
+sleep(542, 2);
 """
 
