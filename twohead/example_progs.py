@@ -74,3 +74,11 @@ prog_merged = """moveTo(60, 60, 0, 1);
 travel(0, 0, 0, 1);
 """
 
+prog_all_r1_easy = """moveTo(100, 100, 0, 1);
+moveTo(100, 200, 0, 1);
+moveTo(200, 200, 0, 1);
+moveTo(200, 100, 0, 1);
+moveTo(100, 100, 0, 1);
+sleep(542, r);
+"""
+
