@@ -1,20 +1,23 @@
 # Verimom
 
-Interpreter with verification for a small subset of Machine-o-Matic (MoM) DSL.
-
 Final project for CSE 507: Computer-Aided Reasoning for Software.
 
 ## Contents
 
-`verimom.rkt` contains an interpreter for the Verimom language.
+`plotter/` contains an interpreter for the Verimom language. This is old code,
+before I changed my direction.
 
-## Scope
+`twohead/` contains all the current code for the project.
 
-For the final project phase of this repo, we restrict ourselves to working with one
-machine: a pen plotter which accepts coordinates in 2D only.
+## Running Tests
 
-## Example Programs
+Test programs are located in `example_progs.py`.
+Add more tests there if you like.
+To run equivalence and performance tests, run `python analyzer.py`.
+Uncomment any tests at the bottom of that file.
+To run the synthesizer, run `python synthesizer.py`.
+At the bottom of `synthesizer.py` edit the program name that the `Rewrite`
+constructor is called on.
+As stated in the project report, unfortunately the synthesizer is
+currently outputting garbage.
 
-1. Scaling a path based on direct manipulation commands from the user.
-2. TBD
-3. TBD
