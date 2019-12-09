@@ -83,7 +83,8 @@ class Rewriter():
         denom = self.cost(self.prog_t, self.prog_r)
         if denom == 0:
             return 1
-        return min(1, e ** -self.BETA * (numer / denom))
+        # Quotient is actually a difference, see paper errata
+        return min(1, e ** -self.BETA * (numer - denom))
 
     def cost(self, prog_t, prog_r):
         # print(prog_t)
